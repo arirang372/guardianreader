@@ -4,7 +4,7 @@ buildscript {
     ext {
         sdkVersion = 25
         buildTools = '26.0.0'
-        realmVersion = '3.4.0'
+        realmVersion = '5.1.0'
         supportLibraryVersion = '25.3.1'
     }
 
