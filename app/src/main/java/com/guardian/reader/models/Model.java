@@ -57,9 +57,9 @@ public class Model
         return dm.loadNewsFeed(selectedSection.id, false);
     }
 
-    public void reloadNewsContent()
+    public  Flowable<RealmResults<GuardianContent>>  reloadNewsContent()
     {
-        dm.loadNewsFeed(selectedSection.id, true);
+        return dm.loadNewsFeed(selectedSection.id, true);
     }
 
     public void markAsRead(String id, boolean read)

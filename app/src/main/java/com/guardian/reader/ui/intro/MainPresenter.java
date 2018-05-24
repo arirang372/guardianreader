@@ -146,7 +146,31 @@ public class MainPresenter implements Presenter
 
     public void refreshList()
     {
-        model.reloadNewsContent();
+        model.reloadNewsContent()
+             .toObservable()
+             .subscribe(new Observer<RealmResults<GuardianContent>>() {
+                 @Override
+                 public void onSubscribe(Disposable d) {
+
+                 }
+
+                 @Override
+                 public void onNext(RealmResults<GuardianContent> guardianContents)
+                 {
+                     view.showList(guardianContents);
+                 }
+
+                 @Override
+                 public void onError(Throwable e) {
+
+                 }
+
+                 @Override
+                 public void onComplete() {
+
+                 }
+             });
+
         view.hideProgress();
     }
 
