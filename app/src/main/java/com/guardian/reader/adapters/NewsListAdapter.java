@@ -8,9 +8,9 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+import com.guardian.reader.R;
 import com.guardian.reader.models.GuardianContent;
 import java.util.List;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -26,7 +26,7 @@ public class NewsListAdapter extends ArrayAdapter<GuardianContent>
 
     public NewsListAdapter(Context context, List<GuardianContent> contents)
     {
-        super(context, android.R.layout.simple_spinner_dropdown_item);
+        super(context, R.layout.single_content_lv_item);
         setNotifyOnChange(false);
         addAll(contents);
         inflater = LayoutInflater.from(context);
@@ -41,7 +41,7 @@ public class NewsListAdapter extends ArrayAdapter<GuardianContent>
         ViewHolder holder;
         if(v == null)
         {
-            v = inflater.inflate(android.R.layout.simple_spinner_dropdown_item, parent, false);
+            v = inflater.inflate( R.layout.single_content_lv_item, parent, false);
             holder = new ViewHolder(v);
             v.setTag(holder);
         }
@@ -51,16 +51,24 @@ public class NewsListAdapter extends ArrayAdapter<GuardianContent>
         }
 
         GuardianContent c = getItem(position);
-        holder.titleView.setText(c.webTitle);
-        holder.titleView.setTextColor(c.getIsRead()? readColor : unreadColor);
+        holder.txtTitle.setText(c.webTitle);
+        holder.txtTitle.setTextColor(c.getIsRead()? readColor : unreadColor);
+
+        holder.txtPublishDate.setText(c.webPublicationDate);
+        holder.txtPublishDate.setTextColor(c.getIsRead()? readColor : unreadColor);
 
         return v;
     }
 
     static class ViewHolder
     {
-        @BindView(android.R.id.text1)
-        TextView titleView;
+        @BindView(R.id.txtTitle)
+        TextView txtTitle;
+
+        @BindView(R.id.txtPublishDate)
+        TextView txtPublishDate;
+
+
         public ViewHolder(View view)
         {
             ButterKnife.bind(this, view);

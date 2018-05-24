@@ -24,7 +24,6 @@ public class Model
         return instance;
     }
 
-
     private Model(DataManager manager)
     {
         dm = manager;
