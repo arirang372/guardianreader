@@ -8,16 +8,17 @@ import com.guardian.reader.rest.models.sections.GuardianSectionResponse;
 import com.guardian.reader.rest.models.sections.HttpSectionResponse;
 import com.guardian.reader.utils.Utils;
 import java.util.List;
+import io.reactivex.Observable;
+import io.reactivex.Observer;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Function;
+import io.reactivex.schedulers.Schedulers;
+import io.reactivex.subjects.BehaviorSubject;
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
-import rx.Observable;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Func1;
-import rx.schedulers.Schedulers;
 import io.realm.Realm;
 import retrofit2.Retrofit;
-import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
-import rx.functions.Action1;
-import rx.subjects.BehaviorSubject;
 import static com.guardian.reader.constants.AppMetadata.BASE_URL;
 import static com.guardian.reader.utils.LogUtils.LOGD;
 
@@ -33,7 +34,7 @@ public class DataLoader
     public DataLoader()
     {
         Retrofit retrofit = new Retrofit.Builder()
-                                        .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
+                                        .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                                         .addConverterFactory(GsonConverterFactory.create())
                                         .baseUrl(BASE_URL)
                                         .build();
@@ -55,33 +56,44 @@ public class DataLoader
         service.getSectionNames("", apiKey)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .map(new Func1<HttpSectionResponse, GuardianSectionResponse>()
+                .map(new Function<HttpSectionResponse, GuardianSectionResponse>()
                 {
                     @Override
-                    public GuardianSectionResponse call(HttpSectionResponse httpSectionResponse) {
+                    public GuardianSectionResponse apply(HttpSectionResponse httpSectionResponse) {
                         return httpSectionResponse.response;
                     }
                 })
-                .flatMap(new Func1<GuardianSectionResponse, Observable<List<GuardianSection>>>() {
+                .flatMap(new Function<GuardianSectionResponse, Observable<List<GuardianSection>>>() {
                     @Override
-                    public Observable<List<GuardianSection>> call(GuardianSectionResponse guardianSectionResponse) {
+                    public Observable<List<GuardianSection>> apply(GuardianSectionResponse guardianSectionResponse) {
                         return Observable.just(guardianSectionResponse.results);
                     }
                 })
-               .subscribe(new Action1<List<GuardianSection>>() {
-                   @Override
-                   public void call(List<GuardianSection> listGuardianResponse) {
-                       LOGD(TAG, "Success - Section received ...");
-                       networkInUse.onNext(false);
-                       processNewsSections(realm, listGuardianResponse);
-                   }
-               }, new Action1<Throwable>() {
-                   @Override
-                   public void call(Throwable throwable) {
-                       networkInUse.onNext(false);
-                       LOGD(TAG, "Fail - error occurred ...");
-                   }
-               });
+                .subscribe(new Observer<List<GuardianSection>>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+
+                    }
+
+                    @Override
+                    public void onNext(List<GuardianSection> guardianSections) {
+                        LOGD(TAG, "Success - Section received ...");
+                        networkInUse.onNext(false);
+                        processNewsSections(realm, guardianSections);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        networkInUse.onNext(false);
+                        LOGD(TAG, "Fail - error occurred ...");
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
+
     }
 
     private void processNewsSections(final Realm realm, final List<GuardianSection> sections)
@@ -125,39 +137,45 @@ public class DataLoader
         service.getNewsContents(sectionId, apiKey)
                .subscribeOn(Schedulers.io())
                .observeOn(AndroidSchedulers.mainThread())
-                .map(new Func1<HttpContentResponse, GuardianContentResponse>()
+                .map(new Function<HttpContentResponse, GuardianContentResponse>()
                 {
                     @Override
-                    public GuardianContentResponse call(HttpContentResponse httpContentResponse)
+                    public GuardianContentResponse apply(HttpContentResponse httpContentResponse)
                     {
                         return httpContentResponse.response;
                     }
                 })
-                .flatMap(new Func1<GuardianContentResponse, Observable<List<GuardianContent>>>()
+                .flatMap(new Function<GuardianContentResponse, Observable<List<GuardianContent>>>()
                 {
                     @Override
-                    public Observable<List<GuardianContent>> call(GuardianContentResponse guardianContentResponse)
+                    public Observable<List<GuardianContent>> apply(GuardianContentResponse guardianContentResponse)
                     {
                         return Observable.just(guardianContentResponse.results);
                     }
                 })
-               .subscribe(new Action1<List<GuardianContent>>()
-               {
-                   @Override
-                   public void call(List<GuardianContent> contents)
-                   {
-                       LOGD(TAG, String.format("Success - Data received : %s", sectionId) );
-                       processNewsContents(realm, contents);
-                       networkInUse.onNext(false);
-                   }
-               }, new Action1<Throwable>()
-               {
-                   @Override
-                   public void call(Throwable throwable) {
+                .subscribe(new Observer<List<GuardianContent>>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
 
+                    }
+
+                    @Override
+                    public void onNext(List<GuardianContent> guardianContents) {
+                        LOGD(TAG, String.format("Success - Data received : %s", sectionId) );
+                        processNewsContents(realm, guardianContents);
                         networkInUse.onNext(false);
-                   }
-               });
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        networkInUse.onNext(false);
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
     }
 
 

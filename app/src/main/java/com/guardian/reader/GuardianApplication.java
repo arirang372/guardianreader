@@ -1,9 +1,11 @@
 package com.guardian.reader;
 
 import android.app.Application;
+
+import io.reactivex.functions.Consumer;
+import io.reactivex.plugins.RxJavaPlugins;
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
-import rx.plugins.RxJavaErrorHandler;
 import static com.guardian.reader.utils.LogUtils.LOGD;
 
 /**
@@ -26,13 +28,12 @@ public class GuardianApplication extends Application
         super.onCreate();
         instance = this;
 
-        rx.plugins.RxJavaPlugins.getInstance().registerErrorHandler(new RxJavaErrorHandler() {
-            @Override
-            public void handleError(Throwable e) {
-                super.handleError(e);
-                LOGD(TAG, e.getMessage());
-            }
-        });
+       RxJavaPlugins.setErrorHandler(new Consumer<Throwable>() {
+           @Override
+           public void accept(Throwable e) throws Exception {
+               LOGD(TAG, e.getMessage());
+           }
+       });
 
         Realm.init(this);
         RealmConfiguration realmConfig = new RealmConfiguration.Builder().build();

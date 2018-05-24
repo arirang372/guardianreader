@@ -10,12 +10,12 @@ import java.io.Closeable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import io.reactivex.Flowable;
+import io.reactivex.Observable;
+import io.reactivex.subjects.BehaviorSubject;
 import io.realm.RealmResults;
 import io.realm.Sort;
-import rx.subjects.BehaviorSubject;
 import io.realm.Realm;
-import rx.Observable;
-
 import static com.guardian.reader.utils.LogUtils.LOGD;
 
 /**
@@ -28,7 +28,7 @@ public class DataManager implements Closeable
     private final DataLoader dataLoader;
     private final String apiKey;
     private Map<String, Long> lastNetworkRequest = new HashMap<>();
-    private BehaviorSubject<Boolean> networkLoading = BehaviorSubject.create(false);
+    private BehaviorSubject<Boolean> networkLoading = BehaviorSubject.create();
     private final String TAG = this.getClass().getSimpleName();
     private final PreferenceManager preferenceManager;
 
@@ -42,10 +42,10 @@ public class DataManager implements Closeable
 
     public Observable<Boolean> networkInUse()
     {
-        return networkLoading.asObservable();
+        return networkLoading;
     }
 
-    public Observable<RealmResults<GuardianSection>> loadAllSections()
+    public Flowable<RealmResults<GuardianSection>> loadAllSections()
     {
         if(!preferenceManager.getBooleanValue("is_loaded"))
         {
@@ -55,11 +55,11 @@ public class DataManager implements Closeable
 
         return     realm.where(GuardianSection.class)
                         .findAllAsync()
-                        .asObservable();
+                        .asFlowable();
     }
 
 
-    public Observable<RealmResults<GuardianContent>> loadNewsFeed(String sectionId, boolean forceReload)
+    public Flowable<RealmResults<GuardianContent>> loadNewsFeed(String sectionId, boolean forceReload)
     {
         if(forceReload || timeSinceLastRequest(sectionId) > AppMetadata.MINIMUM_NETWORK_WAIT_SEC)
         {
@@ -69,8 +69,9 @@ public class DataManager implements Closeable
 
         return realm.where(GuardianContent.class)
                     .equalTo("sectionId", sectionId)
-                    .findAllSortedAsync("webPublicationDate", Sort.DESCENDING)
-                    .asObservable();
+                    .findAllAsync()
+                    .sort("webPublicationDate", Sort.DESCENDING)
+                    .asFlowable();
     }
 
     private long timeSinceLastRequest(String sectionId)

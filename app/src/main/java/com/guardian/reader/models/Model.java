@@ -1,8 +1,10 @@
 package com.guardian.reader.models;
 
 import com.guardian.reader.data.DataManager;
+
+import io.reactivex.Flowable;
+import io.reactivex.Observable;
 import io.realm.RealmResults;
-import rx.Observable;
 /**
  * Created by john on 7/12/2017.
  */
@@ -28,7 +30,7 @@ public class Model
         dm = manager;
     }
 
-    public Observable<RealmResults<GuardianSection>> getAllSections()
+    public Flowable<RealmResults<GuardianSection>> getAllSections()
     {
         return dm.loadAllSections();
     }
@@ -50,7 +52,7 @@ public class Model
         return this.selectedSection;
     }
 
-    public Observable<RealmResults<GuardianContent>> getSelectedNewsContent()
+    public Flowable<RealmResults<GuardianContent>> getSelectedNewsContent()
     {
         return dm.loadNewsFeed(selectedSection.id, false);
     }

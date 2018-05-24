@@ -3,11 +3,10 @@ package com.guardian.reader.rest;
 import com.guardian.reader.rest.models.contents.HttpContentResponse;
 import com.guardian.reader.rest.models.sections.HttpSectionResponse;
 
+import io.reactivex.Observable;
 import retrofit2.http.GET;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
-import rx.Observable;
-
 /**
  * Created by john on 7/11/2017.
  */
