@@ -1,13 +1,13 @@
 package com.guardian.reader.ui.intro;
 
+import android.util.Log;
+
 import com.guardian.reader.models.GuardianContent;
 import com.guardian.reader.models.GuardianSection;
 import com.guardian.reader.models.Model;
 import com.guardian.reader.ui.Presenter;
 import com.guardian.reader.ui.details.DetailsNewsActivity;
-import org.reactivestreams.Subscription;
 import java.util.List;
-import io.reactivex.FlowableSubscriber;
 import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
 import io.realm.RealmResults;
@@ -32,27 +32,33 @@ public class MainPresenter implements Presenter
     {
          model.getAllSections()
                  .toObservable()
-                 .subscribe(new Observer<RealmResults<GuardianSection>>() {
-             @Override
-             public void onSubscribe(Disposable d) {
+                 .subscribe(new Observer<RealmResults<GuardianSection>>()
+                 {
+                     @Override
+                     public void onSubscribe(Disposable d)
+                     {
+                        if(!d.isDisposed())
+                        {
+                            Log.d("onSubscribe", " is called...");
+                        }
+                     }
 
-             }
+                     @Override
+                     public void onNext(RealmResults<GuardianSection> guardianSections) {
+                         Log.d("onNext", " is called...");
+                         view.setupToolBar(guardianSections);
+                     }
 
-             @Override
-             public void onNext(RealmResults<GuardianSection> guardianSections) {
-                 view.setupToolBar(guardianSections);
-             }
+                     @Override
+                     public void onError(Throwable e) {
+                         e.printStackTrace();
+                     }
 
-             @Override
-             public void onError(Throwable e) {
-                e.printStackTrace();
-             }
-
-             @Override
-             public void onComplete() {
-
-             }
-         });
+                     @Override
+                     public void onComplete() {
+                         Log.d("onComplete", " is called...");
+                     }
+                });
     }
 
     @Override

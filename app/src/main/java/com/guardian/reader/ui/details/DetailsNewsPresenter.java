@@ -7,7 +7,10 @@ import org.reactivestreams.Subscription;
 import java.util.concurrent.TimeUnit;
 import io.reactivex.Flowable;
 import io.reactivex.FlowableSubscriber;
+import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+
 /**
  * Created by john on 7/12/2017.
  */
@@ -35,22 +38,23 @@ public class DetailsNewsPresenter implements Presenter
     public void onResume()
     {
         Flowable.timer(2, TimeUnit.SECONDS)
+                  .toObservable()
                                       .observeOn(AndroidSchedulers.mainThread())
-                                      .subscribe(new FlowableSubscriber<Long>() {
+                                      .subscribe(new Observer<Long>() {
                                           @Override
-                                          public void onSubscribe(Subscription s) {
+                                          public void onSubscribe(Disposable d) {
 
                                           }
 
                                           @Override
                                           public void onNext(Long aLong) {
-                                              model.markAsRead(content.sectionId, true);
+                                              model.markAsRead(content.id, true);
                                               DetailsNewsPresenter.this.view.hideProgress();
                                           }
 
                                           @Override
-                                          public void onError(Throwable t) {
-                                              t.printStackTrace();
+                                          public void onError(Throwable e) {
+                                              e.printStackTrace();
                                           }
 
                                           @Override
@@ -65,8 +69,6 @@ public class DetailsNewsPresenter implements Presenter
     {
 
     }
-
-
 
     @Override
     public void onDestroy() {

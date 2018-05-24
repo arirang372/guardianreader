@@ -88,7 +88,7 @@ public class DetailsNewsActivity extends AppCompatActivity
 
     private void init(Bundle b)
     {
-        content =b.getParcelable("news_contents");
+        content = b.getParcelable("news_contents");
         presenter = new DetailsNewsPresenter(this, Model.getInstance(), content);
     }
 

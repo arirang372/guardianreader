@@ -83,7 +83,7 @@ public class DataManager implements Closeable
             return Long.MAX_VALUE;
     }
 
-    public void updateNewsReadState(final String sectionId, final boolean read)
+    public void updateNewsReadState(final String id, final boolean read)
     {
         realm.executeTransactionAsync(new Realm.Transaction()
         {
@@ -91,12 +91,13 @@ public class DataManager implements Closeable
             public void execute(Realm realm)
             {
                 GuardianContent news = realm.where(GuardianContent.class)
-                                            .equalTo("sectionId", sectionId)
+                                            .equalTo("id", id)
                                             .findFirst();
                 if(news != null)
                 {
                     news.setIsRead(read);
                 }
+
             }
         }, new Realm.Transaction.OnError()
         {

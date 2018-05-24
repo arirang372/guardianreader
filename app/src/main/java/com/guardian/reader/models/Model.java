@@ -62,9 +62,9 @@ public class Model
         dm.loadNewsFeed(selectedSection.id, true);
     }
 
-    public void markAsRead(String sectionId, boolean read)
+    public void markAsRead(String id, boolean read)
     {
-        dm.updateNewsReadState(sectionId, read);
+        dm.updateNewsReadState(id, read);
     }
 
 }
