@@ -100,13 +100,16 @@ public class DetailsNewsActivity extends AppCompatActivity
     public void hideProgress()
     {
         try {
-            if (progressbar.getVisibility() != View.GONE) {
-                progressbar.animate().alpha(0f).setListener(new AnimatorListenerAdapter() {
-                    @Override
-                    public void onAnimationCancel(Animator animation) {
-                        progressbar.setVisibility(View.GONE);
-                    }
-                });
+            if(progressbar != null)
+            {
+                if (progressbar.getVisibility() != View.GONE) {
+                    progressbar.animate().alpha(0f).setListener(new AnimatorListenerAdapter() {
+                        @Override
+                        public void onAnimationCancel(Animator animation) {
+                            progressbar.setVisibility(View.GONE);
+                        }
+                    });
+                }
             }
         }
         catch (Exception ex)

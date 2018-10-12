@@ -12,8 +12,6 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-import static java.util.Collections.addAll;
-
 /**
  * Created by john on 7/12/2017.
  */
@@ -24,7 +22,6 @@ public class SectionsAdapter extends BaseAdapter
     private List<GuardianSection>  sections;
     public SectionsAdapter(Context context, List<GuardianSection> sections)
     {
-        addAll(sections);
         inflater = LayoutInflater.from(context);
         this.sections = sections;
     }
