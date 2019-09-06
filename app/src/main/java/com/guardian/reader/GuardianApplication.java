@@ -9,7 +9,7 @@ import io.realm.RealmConfiguration;
 import static com.guardian.reader.utils.LogUtils.LOGD;
 
 /**
- * Created by john on 7/11/2017 This is my stuff
+ * Created by john on 7/11/2017
  */
 
 public class GuardianApplication extends Application
